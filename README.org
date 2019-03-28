@@ -1,1 +1,1 @@
-* getinfoIO
+some scripts that get info about process on linux 
