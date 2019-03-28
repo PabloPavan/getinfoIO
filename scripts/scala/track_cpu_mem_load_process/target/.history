@@ -1,0 +1,17 @@
+~compile
+compile
+~compile
+run
+~compile
+run
+run chorme
+clean
+compile
+run
+run chrome
+ls
+run
+compile
+clean
+ls
+:q
