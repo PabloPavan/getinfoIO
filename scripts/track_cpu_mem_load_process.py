@@ -1,5 +1,6 @@
 import commands
 import time
+import sys
  
 def combine_timestamp(geral, prec):
     lista = geral.split(' ')
@@ -7,22 +8,28 @@ def combine_timestamp(geral, prec):
  
 cpus = []
 mems = []
-sleeptime=1
+sleeptime=0.1 #precision
+if len(sys.argv) <= 1:
+    print "Need some application e.g. (" +sys.argv[0]+" APP)"
+    exit(0)
+
 while 1:
     try:
         #use the command to get cpu and memory usage information, collecting a timestamp as well
         timestamp = time.ctime()
         prectime = time.time()
- 
-        saida = commands.getoutput("top -bn1 |grep fio").split('\n')[0]
+
+        saida = commands.getoutput("top -bn1 | grep "+sys.argv[1].split('\n')[0]).split('\n')[0]
         if(saida == ""):
             time.sleep(sleeptime)
+            print "wait..."
             continue
  
         #parse result and store it
         lista = saida.split('\n')[0].split(' ')
          
         timestamp = combine_timestamp(timestamp, prectime)
+
         mems.append((timestamp, float(lista[len(lista)-5].replace(',','.'))))
         cpus.append(float(lista[len(lista)-7].replace(',','.')))
  
