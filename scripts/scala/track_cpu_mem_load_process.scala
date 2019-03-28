@@ -1,3 +1,5 @@
+#!/usr/bin/env scala
+
 import java.time.LocalDateTime
 import sun.misc.Signal
 import sun.misc.SignalHandler
@@ -6,7 +8,6 @@ import java.io._
 import util.control.Breaks._
 import scala.collection.mutable.ListBuffer
 import java.io.StringWriter
-import au.com.bytecode.opencsv.CSVWriter
 import java.io.FileWriter
 import java.io.BufferedWriter
 import scala.collection.JavaConverters._
@@ -25,36 +26,24 @@ object Main {
 	  		sys.exit
 	  	}
 
-
 		Signal.handle(new Signal("INT"), new SignalHandler() {
 			def handle(sig: Signal) {
 			println(f"\nwill write file\n")
 
-			val out = new BufferedWriter(new FileWriter("test.csv"));
-			val writer = new CSVWriter(out);
+			
+			val file = new File("cpu_mem_usage.csv")
+			val bw = new BufferedWriter(new FileWriter(file))
 
-			val header: List[String] =
-    			List("timestamp", "cpu", "mem")
+    		bw.write("timestamp;cpu;mem\n")
 
-    		val rows: List[List[String]] =
-  			timestamp.zip(cpus.zip(mems)).foldLeft(List.empty[List[String]]){
-    			case (acc, (a, (b, c))) => List(a, b, c) +: acc
-  			}.reverse
-
-    		var listOfRecords= List(header,rows)
-
-    		println(listOfRecords)
-    		// TODO write csv 
-    		writer.writeAll(listOfRecords)
-			out.close()
-    		
-    		//println(writeCsvFile("test.csv", header, rows))
-
-  
+    		for( i <- 0 to timestamp.size-1){
+    			var string = timestamp(i)+";"+cpus(i)+";"+mems(i)+"\n"
+    			bw.write(string)
+      		}
+			bw.close()	 
 			sys.exit(0)
 			}
 		})
-
 
 		while (true) {
 			// continue
@@ -71,32 +60,20 @@ object Main {
 					// exec a extern command 
 					val output = (top #| grep).!!
 
-					println("gabage")
-
 					//get first line and split the values in a list
 					val line = output.split("\n")(0).split(" +") 
-
-					line.foreach(println)
-
-					println(line.size)
-
-					println("gabage")
 					// -4 is cpu
 					// -3 is mem
-					// println(line(line.size-4).replace(",","."))
-					// println(line(line.size-3).replace(",","."))
 					val ts = new java.util.Date()
 
 					timestamp+=ts.toString
 					cpus+=line(line.size-4).replace(",",".")
 					mems+=line(line.size-3).replace(",",".")
 
-					Thread.sleep(sleeptime)
-					
+					Thread.sleep(sleeptime)					
 				}	
 			}
 		}
 	}
-
 }
 
